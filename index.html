@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhucVN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#0f172a);
+background-size:400% 400%;
+animation:gradientMove 15s ease infinite;
+color:white;
+overflow:hidden;
+perspective:1200px;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* ===== CARD ===== */
+.card{
+position:relative;
+width:360px;
+padding:35px;
+border-radius:20px;
+text-align:center;
+transform-style:preserve-3d;
+transition:transform 0.15s ease;
+z-index:1;
+}
+
+/* ===== NEON BORDER ===== */
+.card::before{
+content:"";
+position:absolute;
+inset:-3px;
+border-radius:24px;
+background:linear-gradient(90deg,#38bdf8,#a855f7,#06b6d4,#38bdf8);
+background-size:300% 300%;
+animation:borderRun 6s linear infinite;
+filter:blur(8px);
+z-index:-2;
+}
+
+.card::after{
+content:"";
+position:absolute;
+inset:0;
+border-radius:20px;
+background:rgba(15,23,42,0.9);
+backdrop-filter:blur(15px);
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 20px 60px rgba(0,0,0,0.5);
+z-index:-1;
+}
+
+@keyframes borderRun{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* ===== LIGHT FOLLOW ===== */
+.card .shine{
+position:absolute;
+inset:0;
+border-radius:20px;
+background:radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(56,189,248,0.25), transparent 60%);
+pointer-events:none;
+z-index:2;
+}
+
+/* ===== AVATAR ===== */
+.avatar{
+width:120px;
+height:120px;
+border-radius:50%;
+object-fit:cover;
+border:4px solid #38bdf8;
+box-shadow:0 0 25px rgba(56,189,248,0.7);
+margin-bottom:15px;
+transition:0.4s;
+}
+
+.avatar:hover{
+transform:scale(1.08) rotate(5deg);
+}
+
+/* ===== TYPING ===== */
+.name{
+font-size:22px;
+font-weight:600;
+color:#38bdf8;
+margin-bottom:10px;
+min-height:28px;
+}
+
+.name::after{
+content:"|";
+margin-left:5px;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%,50%,100%{opacity:1;}
+25%,75%{opacity:0;}
+}
+
+.info{
+font-size:14px;
+line-height:24px;
+opacity:0.9;
+margin-bottom:15px;
+}
+
+.btn{
+padding:10px 18px;
+border:none;
+border-radius:10px;
+background:#38bdf8;
+color:#0f172a;
+cursor:pointer;
+font-weight:500;
+transition:0.3s;
+margin-bottom:15px;
+}
+
+.btn:hover{
+opacity:0.8;
+}
+
+.links{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.link{
+padding:10px;
+border-radius:8px;
+background:rgba(255,255,255,0.1);
+cursor:pointer;
+transition:0.3s;
+font-weight:500;
+}
+
+.link:hover{
+background:#38bdf8;
+color:#0f172a;
+transform:translateY(-3px);
+}
+
+footer{
+margin-top:20px;
+font-size:12px;
+opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+<div class="shine"></div>
+
+<img src="avatar.jpg" class="avatar">
+
+<div class="name" id="typingName"></div>
+
+<div class="info">
+📍 Đồng Tháp, Việt Nam <br>
+📞 033****5444 <br>
+📧 hongphuc2024lapvo@gmail.com
+</div>
+
+<button class="btn" onclick="toggleMusic()">🎵 Bật / Tắt Nhạc</button>
+
+<div class="links">
+<div class="link" onclick="openLink('https://discord.gg/6mGG5UHe')">Discord</div>
+<div class="link" onclick="openLink('https://www.roblox.com/vi/users/3744759588/profile')">Roblox</div>
+<div class="link" onclick="openLink('https://vangp746-design.github.io/cong-thong-tin-VPAF/')">GitHub</div>
+<div class="link" onclick="openLink('https://facebook.com')">Facebook</div>
+</div>
+
+<footer>© 2026 Hồng Phúc</footer>
+</div>
+
+<audio id="bgMusic" loop>
+<source src="nhac.mp3" type="audio/mp3">
+</audio>
+
+<script>
+// ===== AUTO MUSIC FADE IN =====
+window.addEventListener("load", function () {
+let music = document.getElementById("bgMusic");
+music.volume = 0;
+
+music.play().then(()=>{
+let fade = setInterval(()=>{
+if(music.volume < 1){
+music.volume += 0.05;
+}else{
+clearInterval(fade);
+}
+},200);
+}).catch(()=>{
+document.addEventListener("click", function autoPlayOnce(){
+music.play();
+document.removeEventListener("click", autoPlayOnce);
+});
+});
+});
+
+// ===== MUSIC BUTTON =====
+function toggleMusic(){
+let music=document.getElementById("bgMusic");
+if(music.paused){
+music.play();
+}else{
+music.pause();
+}
+}
+
+function openLink(url){
+window.open(url,"_blank");
+}
+
+// ===== 3D + LIGHT FOLLOW =====
+const card = document.getElementById("card");
+
+card.addEventListener("mousemove", (e) => {
+const rect = card.getBoundingClientRect();
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+
+const centerX = rect.width / 2;
+const centerY = rect.height / 2;
+
+const rotateX = (y - centerY) / 18;
+const rotateY = (centerX - x) / 18;
+
+card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+card.style.setProperty("--x", x + "px");
+card.style.setProperty("--y", y + "px");
+});
+
+card.addEventListener("mouseleave", () => {
+card.style.transform = "rotateX(0) rotateY(0)";
+});
+
+// ===== TYPING LOOP =====
+const text = "Hồng Phúc";
+const typingElement = document.getElementById("typingName");
+let index = 0;
+let isDeleting = false;
+
+function typeLoop(){
+if(!isDeleting){
+typingElement.textContent = text.substring(0,index++);
+if(index > text.length){
+isDeleting = true;
+setTimeout(typeLoop,1000);
+return;
+}
+}else{
+typingElement.textContent = text.substring(0,index--);
+if(index < 0){
+isDeleting = false;
+}
+}
+setTimeout(typeLoop,120);
+}
+
+typeLoop();
+</script>
+
+</body>
+</html>
